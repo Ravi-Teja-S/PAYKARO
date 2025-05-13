@@ -1,0 +1,41 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+
+ <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+
+      <img src="{% static 'images/payroll.png' %}" class="d-block w-100" style="width:100%; height: 400px; object-fit: fill;" alt="..." >
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'images/manager.png' %}" class="d-block w-100 " style="width:100%; height: 400px; object-fit: fill;" alt="...">
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'images/secure.png' %}" class="d-block w-100 " style="width:100%; height: 400px; object-fit: fill;" alt="...">
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+<div class="badge text-bg-dark text-wrap" style="width: 100%;">
+  <br>
+    <center><p class="fs-1"  >Welcome to PAY<span class="highlight">KARO</span></p>
+    <p class="fs-3">Simplified Payroll, Seamless Management</p></center>
+    <p  class="fs-5 lh-base fw-normal" >
+      Managing payroll shouldn’t be complex—it should be effortless. PAYKARO.com transforms payroll processing<br> with smart automation, precise calculations, and compliance-ready solutions, ensuring your workforce gets paid accurately and on time.
+</p>
+    <p  class="fs-5 lh-base fw-normal" >
+Whether you're a startup or an enterprise, our intuitive platform empowers businesses to streamline<br> salary disbursement, tax deductions, and employee benefits—all in one place. Stay ahead with real-time insights, secure transactions, and a hassle-free experience.
+</p>
+    <p  class="fs-5 lh-base fw-normal"  >
+Join thousands of businesses embracing the future of payroll management.<br> Get started today with PAYKARO!
+    </p>
+  </div>
+{% endblock %}

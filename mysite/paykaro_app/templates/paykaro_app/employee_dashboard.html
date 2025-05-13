@@ -1,0 +1,31 @@
+<!-- templates/paykaro_app/employee_dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f9f9f9; }
+        .container { width: 80%; margin: auto; padding: 40px; background: white; margin-top: 50px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #222; }
+        .menu { margin-top: 20px; }
+        .menu a {
+            display: inline-block; padding: 10px 20px; margin: 10px;
+            background-color: #28a745; color: white; text-decoration: none;
+            border-radius: 5px;
+        }
+        .menu a:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, Employee</h1>
+        <div class="menu">
+            <a href="#">View Profile</a>
+            <a href="#">Apply Leave</a>
+            <a href="#">View Salary Slip</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+</body>
+</html>

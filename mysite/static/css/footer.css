@@ -1,0 +1,91 @@
+
+        /* Custom styles to match PAYKARO branding */
+        .footer {
+            background-color: #0a0a14;
+            color: #ffffff;
+            padding: 60px 0 30px;
+        }
+
+        .footer-heading {
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .footer a {
+            color: #cccccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer a:hover {
+            color: #7b68ee;
+        }
+
+        .social-icon {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+
+        .social-icon:hover {
+            background-color: #7b68ee;
+            color: #ffffff;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
+            margin-top: 40px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            color: #7b68ee;
+        }
+
+        .contact-info i {
+            color: #7b68ee;
+            margin-right: 10px;
+            width: 16px;
+        }
+
+        .footer-newsletter .form-control {
+    background-color: rgba(255,255,255,0.1);
+    border: none;
+    color: #ffffff;
+}
+
+/* Improve placeholder visibility */
+.footer-newsletter .form-control::placeholder {
+    color: rgba(255,255,255,0.7);
+    opacity: 1;
+}
+
+.footer-newsletter .btn {
+    background-color: #7b68ee;
+    color: #ffffff;
+    border: none;
+}
+
+        .btn-purple {
+            background-color: #7b68ee;
+            color: #ffffff;
+        }
+
+        .btn-purple:hover {
+            background-color: #6a5acd;
+            color: #ffffff;
+        }
