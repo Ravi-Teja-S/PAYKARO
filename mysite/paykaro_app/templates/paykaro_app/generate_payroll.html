@@ -1,0 +1,41 @@
+<!-- templates/paykaro_app/generate_payroll.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generate Payroll</title>
+    <style>
+        .container { width: 80%; margin: auto; padding: 20px; }
+        .employee-list { margin: 20px 0; }
+        .submit-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Generate Payroll</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="employee-list">
+                {% for employee in employees %}
+                    <div>
+                        <input type="checkbox" name="employees" value="{{ employee.emp_id }}" id="emp_{{ employee.emp_id }}">
+                        <label for="emp_{{ employee.emp_id }}">
+                            {{ employee.f_name }} {{ employee.l_name }} (ID: {{ employee.emp_id }})
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="submit-btn">Generate Payroll</button>
+        </form>
+        
+        <a href="{% url 'manager_dashboard' %}" style="margin-top: 20px; display: inline-block;">Back to Dashboard</a>
+    </div>
+</body>
+</html>

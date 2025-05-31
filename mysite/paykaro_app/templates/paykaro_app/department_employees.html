@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Department Employees</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1 px solid #ddd; }
+        .container { width: 80%; margin: auto; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>{{ department.dept_name }} Department Employees</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>City</th>
+                    <th>Salary</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in employees %}
+                <tr>
+                    <td>{{ employee.emp_id }}</td>
+                    <td>{{ employee.f_name }} {{ employee.l_name }}</td>
+                    <td>{{ employee.emp_email }}</td>
+                    <td>{{ employee.city }}</td>
+                    <td>{{ employee.sal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{% url 'manager_dashboard' %}" style="margin-top: 20px; display: inline-block;">Back to Dashboard</a>
+    </div>
+</body>
+</html>

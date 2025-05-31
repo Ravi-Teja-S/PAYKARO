@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Employees - PayKaro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #0ea5e9;
+            --success-color: #22c55e;
+            --danger-color: #ef4444;
+            --background-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+
+        }
+
+        body {
+            background: var(--background-color);
+            color: var(--text-primary);
+
+        }
+        .editable.editing {
+            background-color: #fff;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .gender-select {
+            width: 100%;
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .table-container {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: transform 0.2s;
+
+        .table-container:hover {
+    transform: translateY(-2px);
+}
+        .table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+        .table th {
+    background: #f8fafc;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+}
+
+        .table td {
+    vertical-align: middle;
+    padding: 1rem;
+    transition: all 0.2s;
+}
+
+        .table tbody tr {
+    transition: all 0.2s;
+}
+
+        .table tbody tr:hover {
+    background: #f1f5f9;
+}
+        .modal-content {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+        .modal-header {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 1rem 1rem 0 0;
+}
+
+        .modal-footer {
+    border-top: 1px solid #e2e8f0;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 0 0 1rem 1rem;
+}
+        .form-control, .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    padding: 0.75rem;
+    transition: all 0.2s;
+}
+
+        .form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+        .btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+        .btn:hover {
+    transform: translateY(-1px);
+}
+
+        }
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .back-btn {
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+        .back-btn:hover {
+            color: var(--secondary-color);
+        }
+        .btn-add-employee {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+
+        }
+        .btn-add-employee:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+        }
+        .alert {
+            margin-top: 10px;
+        }
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .editable.editing {
+    background: #f8fafc;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+        @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="table-container">
+            <div class="header-actions">
+                <div>
+                    <a href="{% url 'manager_dashboard' %}" class="back-btn mb-3">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                    <h2 class="mt-2">Manage Employees - {{ department }} department</h2>
+                </div>
+                <button type="button" class="btn btn-add-employee shadow-sm" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                    <i class="fas fa-plus me-2"></i> Add Employee
+                </button>
+            </div>
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div id="alertContainer"></div>
+
+            <!-- Add Employee Modal -->
+            <div class="modal fade" id="addEmployeeModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add New Employee</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form method="POST" id="addEmployeeForm">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                <input type="hidden" name="action" value="add">
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" name="f_name" class="form-control" required maxlength="10" pattern="[A-Za-z]+" title="Only letters allowed">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" name="l_name" class="form-control" required maxlength="10" pattern="[A-Za-z]+" title="Only letters allowed">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" name="emp_pass" class="form-control" required maxlength="20" minlength="6">
+                                    <div class="form-text">Minimum 6 characters</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="emp_email" class="form-control" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Age</label>
+                                    <input type="number" name="age" class="form-control" required min="18" max="100">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Gender</label>
+                                    <select name="gender" class="form-select" required>
+                                        <option value="">Select Gender</option>
+                                        <option value="M">Male</option>
+                                        <option value="F">Female</option>
+                                        <option value="O">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">City</label>
+                                    <input type="text" name="city" class="form-control" required maxlength="10">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Salary</label>
+                                    <input type="number" name="sal" class="form-control" required step="0.01" min="0">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Add Employee</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>City</th>
+                            <th>Salary</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in employees %}
+                        <tr data-employee-id="{{ employee.emp_id }}">
+                            <td>{{ employee.emp_id }}</td>
+                            <td class="editable" data-field="f_name">{{ employee.f_name }}</td>
+                            <td class="editable" data-field="l_name">{{ employee.l_name }}</td>
+                            <td class="editable" data-field="emp_email">{{ employee.emp_email }}</td>
+                            <td class="editable" data-field="age">{{ employee.age }}</td>
+                            <td class="editable" data-field="gender">{{ employee.get_gender_display }}</td>
+                            <td class="editable" data-field="city">{{ employee.city }}</td>
+                            <td class="editable" data-field="sal">{{ employee.sal }}</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm edit-btn">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-success btn-sm save-btn" style="display: none;">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                                <button class="btn btn-danger btn-sm cancel-btn" style="display: none;">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                                <button class="btn btn-danger btn-sm delete-btn">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function makeEditable(row) {
+            const editables = row.querySelectorAll('.editable');
+            const originalValues = new Map();
+            
+            editables.forEach(cell => {
+                originalValues.set(cell, cell.textContent.trim());
+                cell.classList.add('editing');
+                
+                if (cell.dataset.field === 'gender') {
+                    const currentValue = cell.textContent.trim();
+                    cell.innerHTML = `
+                        <select class="gender-select">
+                            <option value="M" ${currentValue === 'Male' ? 'selected' : ''}>Male</option>
+                            <option value="F" ${currentValue === 'Female' ? 'selected' : ''}>Female</option>
+                            <option value="O" ${currentValue === 'Other' ? 'selected' : ''}>Other</option>
+                        </select>
+                    `;
+                } else {
+                    cell.contentEditable = true;
+                }
+            });
+            
+            return originalValues;
+        }
+
+        function disableEditing(row, originalValues = null) {
+            const editables = row.querySelectorAll('.editable');
+            editables.forEach(cell => {
+                cell.classList.remove('editing');
+                cell.contentEditable = false;
+                if (originalValues && originalValues.has(cell)) {
+                    if (cell.dataset.field === 'gender') {
+                        cell.innerHTML = originalValues.get(cell);
+                    } else {
+                        cell.textContent = originalValues.get(cell);
+                    }
+                } else if (cell.dataset.field === 'gender') {
+                    const select = cell.querySelector('select');
+                    if (select) {
+                        cell.textContent = select.options[select.selectedIndex].text;
+                    }
+                }
+            });
+        }
+
+        async function saveChanges(row) {
+            const empId = row.dataset.employeeId;
+            const editables = row.querySelectorAll('.editable');
+            const data = {};
+            
+            editables.forEach(cell => {
+                const field = cell.dataset.field;
+                if (field === 'gender') {
+                    const select = cell.querySelector('select');
+                    data[field] = select ? select.value : cell.textContent.trim();
+                } else {
+                    data[field] = cell.textContent.trim();
+                }
+            });
+
+            try {
+                row.classList.add('loading');
+                const response = await fetch(`/api/employees/${empId}/update/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showAlert('Employee updated successfully', 'success');
+                    Object.entries(result.data).forEach(([key, value]) => {
+                        const cell = row.querySelector(`[data-field="${key}"]`);
+                        if (cell) cell.textContent = value;
+                    });
+                    return true;
+                } else {
+                    showAlert(result.message || 'Update failed', 'danger');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Failed to update employee', 'danger');
+                return false;
+            } finally {
+                row.classList.remove('loading');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const tbody = document.querySelector('tbody');
+            
+            // Handle edit/save/cancel buttons
+            tbody.addEventListener('click', async function(e) {
+                const row = e.target.closest('tr');
+                if (!row) return;
+                
+                if (e.target.closest('.edit-btn')) {
+                    row.querySelector('.edit-btn').style.display = 'none';
+                    row.querySelector('.save-btn').style.display = 'inline-block';
+                    row.querySelector('.cancel-btn').style.display = 'inline-block';
+                    row.querySelector('.delete-btn').style.display = 'none';
+                    row.originalValues = makeEditable(row);
+                }
+                else if (e.target.closest('.save-btn')) {
+                    if (await saveChanges(row)) {
+                        row.querySelector('.edit-btn').style.display = 'inline-block';
+                        row.querySelector('.save-btn').style.display = 'none';
+                        row.querySelector('.cancel-btn').style.display = 'none';
+                        row.querySelector('.delete-btn').style.display = 'inline-block';
+                        disableEditing(row);
+                    }
+                }
+                else if (e.target.closest('.cancel-btn')) {
+                    row.querySelector('.edit-btn').style.display = 'inline-block';
+                    row.querySelector('.save-btn').style.display = 'none';
+                    row.querySelector('.cancel-btn').style.display = 'none';
+                    row.querySelector('.delete-btn').style.display = 'inline-block';
+                    disableEditing(row, row.originalValues);
+                }
+                else if (e.target.closest('.delete-btn')) {
+                    if (confirm('Are you sure you want to delete this employee?')) {
+                        const empId = row.dataset.employeeId;
+                        try {
+                            row.classList.add('loading');
+                            const response = await fetch(`/api/employees/${empId}/delete/`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                                }
+                            });
+
+                            if (response.ok) {
+                                row.remove();
+                                showAlert('Employee deleted successfully', 'success');
+                            } else {
+                                showAlert('Failed to delete employee', 'danger');
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            showAlert('Failed to delete employee', 'danger');
+                        } finally {
+                            row.classList.remove('loading');
+                        }
+                    }
+                }
+            });
+
+            // Handle add employee form submission
+            document.getElementById('addEmployeeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                this.classList.add('loading');
+                this.submit();
+            });
+        });
+    </script>
+</body>
+</html>

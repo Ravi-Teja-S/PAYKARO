@@ -2,6 +2,13 @@
 from django.db import models
 from decimal import Decimal
 
+
+class Department(models.Model):
+    dept_id=models.AutoField(primary_key=True)
+    dept_name=models.CharField(max_length=15)
+    def __str__(self):
+        return f"{self.dept_name}"
+
 # Create your models here.
 class Employee(models.Model):
     GENDERS=[('M','Male'),('F','Female'),('O','Other')]
@@ -14,16 +21,13 @@ class Employee(models.Model):
     gender=models.CharField(max_length=1,choices=GENDERS)
     city=models.CharField(max_length=10)
     sal=models.DecimalField(max_digits=10,decimal_places=2,default=0)
+    dept_id=models.ForeignKey('Department',on_delete=models.SET_NULL,null=True)
+    man_id=models.ForeignKey('self',on_delete=models.SET_NULL,null=True)
 
     def __str__(self):
         return f"{self.f_name}"
 
-class Department(models.Model):
-    dept_id=models.AutoField(primary_key=True)
-    dept_name=models.CharField(max_length=15)
-    man_id=models.OneToOneField(Employee,on_delete=models.SET_NULL,null=True)
-    def __str__(self):
-        return f"{self.dept_name}"
+
 
 class Job(models.Model):
     job_id=models.AutoField(primary_key=True)
@@ -84,9 +88,3 @@ class Leave(models.Model):
     payroll_id=models.ForeignKey(Payroll,on_delete=models.CASCADE,null=True)
     def __str__(self):
         return f"{self.leave_id}"
-
-
-
-
-
-
