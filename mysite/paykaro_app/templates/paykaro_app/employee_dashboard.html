@@ -125,12 +125,24 @@
         <div class="row">
             <!-- Profile Section -->
             <div class="col-md-4">
+                <!-- In the profile section -->
                 <div class="dashboard-card profile-section">
-                    <img src="https://via.placeholder.com/120" alt="Profile Picture" class="profile-picture">
+                    <form method="post" action="{% url 'update_profile_photo' %}" enctype="multipart/form-data" class="mb-3">
+                        {% csrf_token %}
+                        <div class="position-relative d-inline-block">
+                            {% if employee.profile_photo %}
+                                <img src="{{ employee.profile_photo.url }}" alt="Profile Picture" class="profile-picture">
+                            {% else %}
+                                <img src="https://via.placeholder.com/120" alt="Profile Picture" class="profile-picture">
+                            {% endif %}
+                            <label for="profile_photo" class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2" style="cursor: pointer;">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                            <input type="file" id="profile_photo" name="profile_photo" class="d-none" onchange="this.form.submit()">
+                        </div>
+                    </form>
                     <h3>{{ employee.f_name }} {{ employee.l_name }}</h3>
-                    <p class="text-secondary">{{ employee.emp_email }}</p>
-                    <p><i class="fas fa-map-marker-alt"></i> {{ employee.city }}</p>
-                    <p><i class="fas fa-building"></i> {{ employee.dept_id }}</p>
+                    <!-- ... rest of the profile section ... -->
                 </div>
             </div>
 

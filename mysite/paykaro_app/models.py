@@ -1,4 +1,3 @@
-
 from django.db import models
 from decimal import Decimal
 
@@ -23,6 +22,7 @@ class Employee(models.Model):
     sal=models.DecimalField(max_digits=10,decimal_places=2,default=0)
     dept_id=models.ForeignKey('Department',on_delete=models.SET_NULL,null=True)
     man_id=models.ForeignKey('self',on_delete=models.SET_NULL,null=True)
+    profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
 
     def __str__(self):
         return f"{self.f_name}"
@@ -88,3 +88,10 @@ class Leave(models.Model):
     payroll_id=models.ForeignKey(Payroll,on_delete=models.CASCADE,null=True)
     def __str__(self):
         return f"{self.leave_id}"
+
+    @property
+    def duration(self):
+        """Calculate the duration of leave in days"""
+        if self.start_date and self.end_date:
+            return (self.end_date - self.start_date).days + 1
+        return 0

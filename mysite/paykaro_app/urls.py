@@ -26,4 +26,5 @@ urlpatterns = [
     # Add these to your existing urlpatterns
     path('employee/apply-leave/', views.apply_leave, name='apply_leave'),
     path('employee/salary/', views.view_salary, name='view_salary'),
+    path('update-profile-photo/', views.update_profile_photo, name='update_profile_photo'),
 ]

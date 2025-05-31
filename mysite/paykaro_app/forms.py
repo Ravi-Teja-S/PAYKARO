@@ -9,3 +9,9 @@ class EmployeeSignupForm(forms.ModelForm):
     class Meta:
         model = Employee
         fields = ['f_name', 'l_name', 'emp_email', 'emp_pass', 'age', 'gender', 'city']
+
+
+class ProfilePhotoForm(forms.ModelForm):
+    class Meta:
+        model = Employee
+        fields = ['profile_photo']

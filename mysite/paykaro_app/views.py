@@ -17,8 +17,10 @@ import csv
 from django.http import HttpResponse
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
-from functools import wraps
 from django.shortcuts import redirect
+from .forms import ProfilePhotoForm
+from django.db import models
+from functools import wraps
 
 def manager_login_required(view_func):
     @wraps(view_func)
@@ -83,17 +85,51 @@ def view_department_employees(request):
     
     manager_id = request.session.get('emp_id')
     try:
-        # Get the manager's employee record
         manager = Employee.objects.get(emp_id=manager_id)
-        # Get the department the manager belongs to
         department = manager.dept_id
-        # Get all employees in this department
         employees = Employee.objects.filter(dept_id=department)
         
-        return render(request, 'paykaro_app/department_employees.html', {
+        # Calculate additional statistics
+        total_employees = employees.count()
+        gender_distribution = {
+            'Male': employees.filter(gender='M').count(),
+            'Female': employees.filter(gender='F').count(),
+            'Other': employees.filter(gender='O').count(),
+        }
+        
+        # Calculate average salary
+        avg_salary = employees.exclude(emp_id=manager_id).aggregate(
+            avg_salary=models.Avg('sal')
+        )['avg_salary'] or 0
+        
+        # Get active leaves count
+        active_leaves = Leave.objects.filter(
+            emp_id__dept_id=department,
+            status='A',
+            end_date__gte=timezone.now().date()
+        ).count()
+        
+        # Get employees on leave today
+        employees_on_leave = Leave.objects.filter(
+            emp_id__dept_id=department,
+            status='A',
+            start_date__lte=timezone.now().date(),
+            end_date__gte=timezone.now().date()
+        ).select_related('emp_id')
+        
+        context = {
             'department': department,
-            'employees': employees
-        })
+            'manager': manager,
+            'total_employees': total_employees,
+            'gender_distribution': gender_distribution,
+            'avg_salary': avg_salary,
+            'active_leaves': active_leaves,
+            'employees_on_leave': employees_on_leave,
+            'employees': employees,
+        }
+        
+        return render(request, 'paykaro_app/department_employees.html', context)
+        
     except Employee.DoesNotExist:
         messages.error(request, 'Manager not found.')
         return redirect('manager_login')
@@ -107,43 +143,54 @@ import json
 def manage_employees(request):
     manager_id = request.session.get('emp_id')
     try:
-        # Get the manager's employee record
         manager = Employee.objects.get(emp_id=manager_id)
-        # Get the department the manager belongs to
         department = manager.dept_id
-        # Get all employees in this department except the manager
         employees = Employee.objects.filter(dept_id=department).exclude(emp_id=manager_id)
         
-        if request.method == 'POST':
-            action = request.POST.get('action')
-            
-            if action == 'add':
-                try:
-                    # Handle adding new employee
-                    new_employee = Employee(
-                        f_name=request.POST.get('f_name'),
-                        l_name=request.POST.get('l_name'),
-                        emp_pass=request.POST.get('emp_pass'),
-                        emp_email=request.POST.get('emp_email'),
-                        age=int(request.POST.get('age')),
-                        gender=request.POST.get('gender'),
-                        city=request.POST.get('city'),
-                        sal=float(request.POST.get('sal')),
-                        dept_id=department,
-                        man_id=manager
-                    )
-                    new_employee.save()
-                    messages.success(request, 'Employee added successfully!')
-                except Exception as e:
-                    messages.error(request, f'Error adding employee: {str(e)}')
-            
-            return redirect('manage_employees')
+        # Handle search and filters
+        search_query = request.GET.get('search', '')
+        gender_filter = request.GET.get('gender', '')
+        min_age = request.GET.get('min_age', '')
+        max_age = request.GET.get('max_age', '')
+        min_salary = request.GET.get('min_salary', '')
+        max_salary = request.GET.get('max_salary', '')
         
+        if search_query:
+            employees = employees.filter(
+                models.Q(f_name__icontains=search_query) |
+                models.Q(l_name__icontains=search_query) |
+                models.Q(emp_email__icontains=search_query) |
+                models.Q(city__icontains=search_query)
+            )
+        
+        if gender_filter:
+            employees = employees.filter(gender=gender_filter)
+            
+        if min_age:
+            employees = employees.filter(age__gte=min_age)
+        if max_age:
+            employees = employees.filter(age__lte=max_age)
+            
+        if min_salary:
+            employees = employees.filter(sal__gte=min_salary)
+        if max_salary:
+            employees = employees.filter(sal__lte=max_salary)
+
+        # Handle POST requests (adding new employee)
+        if request.method == 'POST':
+        # ... (keep your existing POST handling code)
+            pass
         return render(request, 'paykaro_app/manage_employees.html', {
             'employees': employees,
             'department': department,
-            'manager': manager
-        })
+            'manager': manager,
+            'search_query': search_query,
+            'gender_filter': gender_filter,
+            'min_age': min_age,
+            'max_age': max_age,
+            'min_salary': min_salary,
+            'max_salary': max_salary
+            })
         
     except Employee.DoesNotExist:
         messages.error(request, 'Manager not found.')
@@ -559,3 +606,29 @@ def view_salary(request):
     except Salary.DoesNotExist:
         messages.error(request, 'Salary information not found.')
         return redirect('employee_dashboard')
+
+from functools import wraps
+
+def any_user_login_required(view_func):
+    @wraps(view_func)
+    def wrapped(request, *args, **kwargs):
+        if not request.session.get('emp_id'):
+            return redirect('employee_login')
+        return view_func(request, *args, **kwargs)
+    return wrapped
+
+@any_user_login_required
+def update_profile_photo(request):
+    if request.method == 'POST':
+        try:
+            employee = Employee.objects.get(emp_id=request.session.get('emp_id'))
+            form = ProfilePhotoForm(request.POST, request.FILES, instance=employee)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Profile photo updated successfully!')
+            else:
+                messages.error(request, 'Error updating profile photo')
+        except Employee.DoesNotExist:
+            messages.error(request, 'Employee not found')
+            
+    return redirect('manager_dashboard' if request.session.get('role') == 'manager' else 'employee_dashboard')

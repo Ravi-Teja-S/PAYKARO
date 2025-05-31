@@ -173,11 +173,7 @@
                             <td>{{ leave.emp_id.dept_id }}</td>
                             <td>{{ leave.start_date }}</td>
                             <td>{{ leave.end_date }}</td>
-                            <td>
-                                {% with duration=leave.end_date|timesince:leave.start_date %}
-                                {{ duration }}
-                                {% endwith %}
-                            </td>
+                            <td>{{ leave.duration }} days</td>
                             <td>{{ leave.reason }}</td>
                             <td>
                                 <span class="status-badge status-pending">
