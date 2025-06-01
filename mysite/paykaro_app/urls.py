@@ -27,4 +27,6 @@ urlpatterns = [
     path('employee/apply-leave/', views.apply_leave, name='apply_leave'),
     path('employee/salary/', views.view_salary, name='view_salary'),
     path('update-profile-photo/', views.update_profile_photo, name='update_profile_photo'),
+    path('generate-payroll/', views.generate_payroll, name='generate_payroll'),
+
 ]
