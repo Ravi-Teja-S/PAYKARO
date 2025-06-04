@@ -1,26 +1,28 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from .forms import EmployeeSignupForm
-# Make sure the path to your models is correct
-from .models import Employee, Department, Leave, Salary, Payroll
-from decimal import Decimal, InvalidOperation
-import csv
-from django.http import HttpResponse
-from django.core.exceptions import ValidationError
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import redirect
-from .forms import ProfilePhotoForm
-from django.db import models
-from io import BytesIO
 import calendar
+import csv
+import json
+# Make sure the path to your models is correct
+from decimal import Decimal, InvalidOperation
+from io import BytesIO
+from functools import wraps
+from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.http import HttpResponse
+from django.http import JsonResponse
+from django.shortcuts import redirect
+from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-import json
+
+from .forms import EmployeeSignupForm
+from .forms import ProfilePhotoForm
+from .models import Employee, Leave, Salary, Payroll
 
 
 def generate_pdf_payroll(payroll_records, department, year, month):
@@ -173,7 +175,7 @@ def generate_pdf_payroll(payroll_records, department, year, month):
     buffer.close()
     return pdf
 
-from functools import wraps
+
 def manager_login_required(view_func):
     @wraps(view_func)
     def wrapped(request, *args, **kwargs):
@@ -345,45 +347,43 @@ def manage_employees(request):
         messages.error(request, 'Manager not found.')
         return redirect('manager_dashboard')
 
-@manager_login_required
 def approve_leaves(request):
     if request.session.get('role') != 'manager':
         return redirect('manager_login')
 
     manager_id = request.session.get('emp_id')
     try:
-        # Get the manager's employee record
         manager = Employee.objects.get(emp_id=manager_id)
-        # Get the department the manager belongs to
         department = manager.dept_id
 
-        # Get pending leaves for employees in manager's department
         pending_leaves = Leave.objects.filter(
-            emp_id__dept_id=department,  # Using dept_id directly from Employee model
+            emp_id__dept_id=department,
             status='P'
-        ).select_related('emp_id')  # Optimize by pre-fetching employee data
+        ).select_related('emp_id')
 
         if request.method == 'POST':
             leave_id = request.POST.get('leave_id')
             action = request.POST.get('action')
 
             leave = get_object_or_404(Leave, leave_id=leave_id)
-            # Verify the leave belongs to an employee in manager's department
             if leave.emp_id.dept_id != department:
                 messages.error(request, 'Unauthorized: Leave belongs to employee from different department')
                 return redirect('approve_leaves')
 
             if action == 'approve':
                 leave.status = 'A'
-                # If approved, create a Payroll entry if needed
                 if not leave.payroll_id:
                     try:
                         salary = Salary.objects.get(emp_id=leave.emp_id)
                         payroll = Payroll.objects.create(
-                            tot_amt=0,  # This should be calculated based on your business logic
-                            date=timezone.now(),
-                            salary_id=salary
+                            employee=leave.emp_id,
+                            salary=salary,
+                            pay_period_start=timezone.now().date(),
+                            pay_period_end=timezone.now().date(),
+                            processed_by=manager
                         )
+                        payroll.calculate_net_salary()
+                        payroll.save()
                         leave.payroll_id = payroll
                     except Salary.DoesNotExist:
                         messages.warning(request, 'Leave approved but no salary record found for payroll creation')
@@ -401,6 +401,7 @@ def approve_leaves(request):
     except Employee.DoesNotExist:
         messages.error(request, 'Manager not found.')
         return redirect('manager_login')
+
 
 
 @manager_login_required

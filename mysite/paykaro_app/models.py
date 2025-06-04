@@ -20,6 +20,8 @@ class Job(models.Model):
 
 # Create your models here.
 class Employee(models.Model):
+    DoesNotExist = None
+    objects = None
     GENDERS=[('M','Male'),('F','Female'),('O','Other')]
     emp_id=models.AutoField(primary_key=True)
     f_name=models.CharField(max_length=10)
@@ -42,6 +44,8 @@ class Employee(models.Model):
 
 
 class Salary(models.Model):
+    DoesNotExist = None
+    objects = None
     salary_id=models.AutoField(primary_key=True)
     basic = models.DecimalField(max_digits=10, decimal_places=2, help_text="Basic salary")
     DA = models.DecimalField(max_digits=10, decimal_places=2, help_text="Dearness Allowance")
@@ -51,8 +55,6 @@ class Salary(models.Model):
     PF = models.DecimalField(max_digits=10, decimal_places=2, help_text="Provident Fund contribution")
     health_ins = models.DecimalField(max_digits=10, decimal_places=2, help_text="Health insurance deduction",default=1000)
     emp_id = models.OneToOneField(Employee, on_delete=models.CASCADE,null=True)
-    def __str__(self):
-        return f"{self.salary_id}"
 
     def save(self, *args, **kwargs):
         # Get the actual Decimal values from the fields
@@ -74,6 +76,7 @@ class Salary(models.Model):
         return f"Salary for Basic: {self.basic}"
 
 class Payroll(models.Model):
+    objects = None
     PAYMENT_STATUS = [
         ('P', 'Pending'),
         ('C', 'Completed'),
@@ -103,6 +106,8 @@ class Payroll(models.Model):
     remarks = models.TextField(blank=True, null=True)
     report = models.FileField(upload_to='payroll_reports/', null=True, blank=True)
 
+    def __sub__(self, other):
+        return self.pay_period_end - other.pay_period_start
     class Meta:
         ordering = ['-generation_date']
         indexes = [
@@ -131,7 +136,9 @@ class Payroll(models.Model):
             leave_end = min(leave.end_date, self.pay_period_end)
             leave_days = (leave_end - leave_start).days + 1
             total_leave_days += leave_days
-        
+
+
+
         working_days = (self.pay_period_end - self.pay_period_start).days + 1
         per_day_salary = salary.basic / Decimal(working_days)
         self.leave_deduction = per_day_salary * Decimal(total_leave_days)
@@ -144,7 +151,10 @@ class Payroll(models.Model):
     def __str__(self):
         return f"Payroll-{self.payroll_id} for {self.employee.f_name} {self.employee.l_name} - {self.get_payment_period_display()}"
 
+
+
 class Leave(models.Model):
+    objects = None
     STATUSES=[('P','Pending'),('A','Approved'),('R','Rejected')]
     leave_id=models.AutoField(primary_key=True)
     start_date=models.DateField()
