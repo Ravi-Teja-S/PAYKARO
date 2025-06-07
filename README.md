@@ -18,7 +18,7 @@ PAYKARO is a web-based payroll management system built using **Python** and **Dj
 - **Authentication:** Django Authentication System
 
 ## Frontend
-![Image 1]
+![Image 1](https://github.com/Ravi-Teja-S/PAYKARO/blob/main/mysite/media/Screenshot%202025-06-07%20121817.png?raw=true)
 ![Image 2]
 ![Image 3]
 ![Image 4]
