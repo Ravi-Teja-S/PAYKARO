@@ -19,11 +19,14 @@ PAYKARO is a web-based payroll management system built using **Python** and **Dj
 
 ## Frontend
 ![Image 1](https://github.com/Ravi-Teja-S/PAYKARO/blob/main/mysite/media/Screenshot%202025-06-07%20121817.png?raw=true)
-![Image 2]
-![Image 3]
-![Image 4]
-![Image 5]
-![Image 6]
+![Image 2](https://github.com/Ravi-Teja-S/PAYKARO/blob/main/mysite/media/Screenshot%202025-06-07%20122322.png?raw=true)
+![Image 3](https://github.com/Ravi-Teja-S/PAYKARO/blob/main/mysite/media/Screenshot%202025-06-07%20122335.png?raw=true
+)
+![Image 4](https://github.com/Ravi-Teja-S/PAYKARO/blob/main/mysite/media/Screenshot%202025-06-07%20122345.png?raw=true
+)
+![Image 5](https://github.com/Ravi-Teja-S/PAYKARO/blob/main/mysite/media/Screenshot%202025-06-03%20153026.png?raw=true
+)
+![Image 6](https://github.com/Ravi-Teja-S/PAYKARO/blob/main/mysite/media/Screenshot%202025-06-03%20152623.png?raw=true)
 
 ## Installation
 To set up the project locally, follow these steps:
