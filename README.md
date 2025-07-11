@@ -3,6 +3,9 @@
 ## Overview
 PAYKARO is a web-based payroll management system built using **Python** and **Django**, with **MySQL** as the database backend. It helps businesses streamline salary calculations, employee records, and tax deductions efficiently.
 
+## DEPLOYED - VIEW LIVE HERE
+https://paykaro-payroll-managenent-system.onrender.com
+
 ## Features
 - Employee registration and management
 - Salary calculation and tax deductions
