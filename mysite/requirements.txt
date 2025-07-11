@@ -1,0 +1,6 @@
+Django>=3.2,<5.0
+gunicorn
+psycopg2-binary
+whitenoise
+Pillow
+reportlab
