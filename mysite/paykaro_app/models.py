@@ -36,6 +36,11 @@ class Employee(models.Model):
     man_id=models.ForeignKey('self',on_delete=models.SET_NULL,null=True,blank=True)
     profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
     job = models.ForeignKey(Job, on_delete=models.SET_NULL, null=True, blank=True)
+     ROLES = [
+        ('manager', 'Manager'),
+        ('employee', 'Employee'),
+    ]
+    role = models.CharField(max_length=10, choices=ROLES, default='employee')
     def __str__(self):
         return f"{self.f_name}"
 
