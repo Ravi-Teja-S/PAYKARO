@@ -1,6 +1,8 @@
 import calendar
 import csv
 import json
+import os
+import mimetypes
 # Make sure the path to your models is correct
 from decimal import Decimal, InvalidOperation
 from io import BytesIO
@@ -25,8 +27,13 @@ from .models import Employee, Leave, Salary, Payroll
 
 def serve_media(request, path):
     full_path = os.path.join(settings.MEDIA_ROOT, path)
-    if os.path.exists(full_path):
-        return FileResponse(open(full_path, 'rb'))
+    if os.path.isfile(full_path):
+        content_type, _ = mimetypes.guess_type(full_path)
+        try:
+            return FileResponse(open(full_path, 'rb'), content_type=content_type or 'application/octet-stream')
+        except Exception as e:
+            print(f"Error reading file: {e}")
+            raise Http404("Cannot open media file.")
     else:
         raise Http404("Media file not found.")
         
