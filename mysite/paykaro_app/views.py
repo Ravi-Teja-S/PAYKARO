@@ -8,8 +8,7 @@ from functools import wraps
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.http import HttpResponse
-from django.http import JsonResponse
+from django.http import HttpResponse , JsonResponse ,FileResponse , Http404
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
@@ -24,7 +23,13 @@ from .forms import EmployeeSignupForm
 from .forms import ProfilePhotoForm
 from .models import Employee, Leave, Salary, Payroll
 
-
+def serve_media(request, path):
+    full_path = os.path.join(settings.MEDIA_ROOT, path)
+    if os.path.exists(full_path):
+        return FileResponse(open(full_path, 'rb'))
+    else:
+        raise Http404("Media file not found.")
+        
 def generate_pdf_payroll(payroll_records, department, year, month):
     buffer = BytesIO()
 
