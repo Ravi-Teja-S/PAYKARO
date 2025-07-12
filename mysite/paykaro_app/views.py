@@ -25,17 +25,28 @@ from .forms import EmployeeSignupForm
 from .forms import ProfilePhotoForm
 from .models import Employee, Leave, Salary, Payroll
 
+from PIL import Image, UnidentifiedImageError
+
 def serve_media(request, path):
     full_path = os.path.join(settings.MEDIA_ROOT, path)
-    if os.path.isfile(full_path):
-        content_type, _ = mimetypes.guess_type(full_path)
-        try:
-            return FileResponse(open(full_path, 'rb'), content_type=content_type or 'application/octet-stream')
-        except Exception as e:
-            print(f"Error reading file: {e}")
-            raise Http404("Cannot open media file.")
-    else:
+
+    if not os.path.isfile(full_path):
         raise Http404("Media file not found.")
+
+    try:
+        # Validate image integrity before serving (optional but powerful)
+        with open(full_path, 'rb') as f:
+            try:
+                Image.open(f).verify()
+            except UnidentifiedImageError:
+                print(f"Corrupted image: {full_path}")
+                raise Http404("Invalid image file.")
+
+        return FileResponse(open(full_path, 'rb'))
+    except Exception as e:
+        print(f"Error serving media: {e}")
+        raise Http404("Cannot open media file.")
+
         
 def generate_pdf_payroll(payroll_records, department, year, month):
     buffer = BytesIO()
