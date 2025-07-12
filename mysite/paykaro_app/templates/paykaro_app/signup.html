@@ -3,20 +3,7 @@
  <h2>Register</h2>
 <form method="POST">
     {% csrf_token %}
-    <label for="id_f_name">First Name:</label>
-    {{ form.f_name }}
-
-    <label for="id_l_name">Last Name:</label>
-    {{ form.l_name }}
-
-    <label for="id_emp_email">Email:</label>
-    {{ form.emp_email }}
-
-    <label for="id_emp_pass">Password:</label>
-    {{ form.emp_pass }}
-
-    <label for="id_role">Role:</label>
-    {{ form.role }}
+     {{ form.as_p }}
 
     <button type="submit">Sign Up</button>
 </form>
