@@ -191,7 +191,7 @@ def manager_login(request):
         try:
             emp = Employee.objects.get(emp_email=email, emp_pass=password)
             # Check if this employee is a manager by seeing if any employees report to them
-            if Employee.objects.filter(man_id=emp).exists():
+            if emp.role== 'manager':
                 request.session['emp_id'] = emp.emp_id
                 request.session['role'] = 'manager'
                 return redirect('manager_dashboard')
@@ -209,10 +209,7 @@ def employee_login(request):
         try:
             emp = Employee.objects.get(emp_email=email, emp_pass=password)
 
-            # Check if this employee is a manager (has employees reporting to them)
-            is_manager = Employee.objects.filter(man_id=emp).exists()
-
-            if not is_manager:
+            if emp.role=='employee':
                 request.session['emp_id'] = emp.emp_id
                 request.session['role'] = 'employee'
                 return redirect('employee_dashboard')
